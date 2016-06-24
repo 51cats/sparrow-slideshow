@@ -1,0 +1,826 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta charset="US-ASCII">
+<title>Sparrow Slideshow</title>
+<script type="text/javascript">
+
+//====================================
+//===  SHRINK TO FIT THE VIEWPORT  ===
+//====================================
+
+// Determine scale_factor
+
+var optimum_width  = 505;
+var optimum_height = 523;
+
+var viewport_width  = document.documentElement.clientWidth;
+var viewport_height = document.documentElement.clientHeight;
+
+var percent_width  = Math.round( ( viewport_width  / optimum_width  ) * 100 );
+var percent_height = Math.round( ( viewport_height / optimum_height ) * 100 );
+
+var scale_factor = 100;
+
+if ( percent_height < percent_width ) {
+  if ( percent_height < 100 ) { scale_factor = percent_height; }
+}
+else {
+  if ( percent_width < 100 ) { scale_factor = percent_width; }
+}
+
+//========================
+//===  SET STYLESHEET  ===
+//========================
+
+// Utilize scale_factor in CSS
+
+var style = document.createElement('style');
+
+style.type = 'text/css';
+
+style.innerHTML = "body {\
+  background-image: url('image/wall.png');\
+  background-size: " + Math.round( 1349 * scale_factor / 100 ) + "px " + Math.round( 541 * scale_factor / 100 ) + "px;\
+  margin: 0;\
+  border: 0;\
+  padding: 0;\
+}\
+\
+#container {\
+  position: absolute;\
+\
+  top: 0;\
+  left: 0;\
+  bottom: 0;\
+  right: 0;\
+\
+  width: " + Math.round( 505 * scale_factor / 100 ) + "px;\
+  height: " + Math.round( 523 * scale_factor / 100 ) + "px;\
+\
+  margin: auto;\
+  border: 0;\
+  padding: 0;\
+}\
+\
+/*=====================\
+/===  POST-IT NOTE  ===\
+/=====================*/\
+\
+#postit {\
+  position: absolute;\
+\
+  top: 0;\
+  left: 0;\
+  bottom: 0;\
+  right: 0;\
+\
+  width: " + Math.round( 321 * scale_factor / 100 ) + "px;\
+  height: " + Math.round( 345 * scale_factor / 100 ) + "px;\
+\
+  margin: auto;\
+  border: 0;\
+  padding: 0;\
+\
+  background: url('image/postit1.png');\
+  background-size: " + Math.round( 321 * scale_factor / 100 ) + "px " + Math.round( 345 * scale_factor / 100 ) + "px;\
+}\
+\
+#note {\
+  position: relative;\
+\
+  top: " + Math.round( 28 * scale_factor / 100 ) + "px;\
+  left: " + Math.round( 50 * scale_factor / 100 ) + "px;\
+\
+  width: " + Math.round( 231 * scale_factor / 100 ) + "px;\
+  height: " + Math.round( 233 * scale_factor / 100 ) + "px;\
+\
+  margin: 0;\
+  border: 0;\
+  padding: 0;\
+\
+  background: url('image/note.png');\
+  background-size: " + Math.round( 231 * scale_factor / 100 ) + "px " + Math.round( 233 * scale_factor / 100 ) + "px;\
+}\
+\
+/*==================\
+/===  POLAROIDS  ===\
+/==================*/\
+\
+#photo1, #photo0 {\
+  position: absolute;\
+\
+  top: " + Math.round( 35 * scale_factor / 100 ) + "px;\
+  left: " + Math.round( 36 * scale_factor / 100 ) + "px;\
+\
+  margin: 0;\
+  border: 0;\
+  padding: 0;\
+\
+  width: " + Math.round( 432 * scale_factor / 100 ) + "px;\
+  height: " + Math.round( 470 * scale_factor / 100 ) + "px;\
+}\
+\
+#photo0 {\
+  opacity: 0;\
+\
+  background: url('slide/photo00.png');\
+  background-size: " + Math.round( 432 * scale_factor / 100 ) + "px " + Math.round( 470 * scale_factor / 100 ) + "px;\
+}\
+\
+#photo1 {\
+  visibility: hidden;\
+\
+  background: url('slide/photo00.png');\
+  background-size: " + Math.round( 432 * scale_factor / 100 ) + "px " + Math.round( 470 * scale_factor / 100 ) + "px;\
+}\
+\
+.pause {\
+  opacity: 1;\
+}\
+\
+/*=================\
+/===  PUSH PIN  ===\
+/=================*/\
+\
+#pin {\
+  position: absolute;\
+\
+  top: " + Math.round( 70 * scale_factor / 100 ) + "px;\
+  left: " + Math.round( 248 * scale_factor / 100 ) + "px;\
+\
+  margin: 0;\
+  border: 0;\
+  padding: 0;\
+\
+  width: " + Math.round( 35 * scale_factor / 100 ) + "px;\
+  height: " + Math.round( 67 * scale_factor / 100 ) + "px;\
+\
+  background: url('image/pin1.png');\
+  background-size: " + Math.round( 35 * scale_factor / 100 ) + "px " + Math.round( 67 * scale_factor / 100 ) + "px;\
+  cursor: pointer;\
+}\
+\
+/*==============\
+/===  SOUND  ===\
+/==============*/\
+\
+#sound {\
+  display: none;\
+  position: absolute;\
+\
+  top: " + Math.round( 105 * scale_factor / 100 ) + "px;\
+  left: " + Math.round( 35 * scale_factor / 100 ) + "px;\
+\
+  margin: 0;\
+  border: 0;\
+  padding: 0;\
+\
+  width: " + Math.round( 35 * scale_factor / 100 ) + "px;\
+  height: " + Math.round( 35 * scale_factor / 100 ) + "px;\
+\
+  opacity: .30;\
+\
+  background: url('image/sound1.png');\
+  background-size: " + Math.round( 35 * scale_factor / 100 ) + "px " + Math.round( 35 * scale_factor / 100 ) + "px;\
+  cursor: pointer;\
+}\
+\
+/*=======================\
+/===  PLAY AND PAUSE  ===\
+/=======================*/\
+\
+#icon1, #icon2 {\
+  margin: auto;\
+  position: fixed;\
+  top: 0;\
+  left: 0;\
+  bottom: 0;\
+  right: 0;\
+\
+  border: 0;\
+  padding: 0;\
+}\
+\
+#icon1  {\
+  width: " + Math.round( 54 * scale_factor / 100 ) + "px;\
+  height: " + Math.round( 62 * scale_factor / 100 ) + "px;\
+\
+  background: url('image/play.png');\
+  background-size: " + Math.round( 54 * scale_factor / 100 ) + "px " + Math.round( 62 * scale_factor / 100 ) + "px;\
+}\
+\
+#icon2 {\
+  width: " + Math.round( 36 * scale_factor / 100 ) + "px;\
+  height: " + Math.round( 60 * scale_factor / 100 ) + "px;\
+\
+  background: url('image/pause.png');\
+  background-size: " + Math.round( 35 * scale_factor / 100 ) + "px " + Math.round( 60 * scale_factor / 100 ) + "px;\
+}\
+\
+.none  { visibility: hidden; }\
+\
+/*===================\
+/===  ANIMATIONS  ===\
+/===================*/\
+\
+.fadeOut {\
+  /* Chrome, Safari, Opera */\
+  -webkit-animation-name: fadeOut;\
+  -webkit-animation-duration: 3s;\
+  -webkit-animation-timing-function: ease-in-out;\
+  -webkit-animation-iteration-count: 1;\
+  -webkit-animation-direction: normal;\
+  -webkit-animation-fill-mode: forwards;\
+  -webkit-animation-play-state: running;\
+\
+  /* Standard syntax */\
+  animation-name: fadeOut;\
+  animation-duration: 3s;\
+  animation-timing-function: ease-in-out;\
+  animation-iteration-count:1;\
+  animation-direction: normal;\
+  animation-fill-mode: forwards;\
+  animation-play-state: running;\
+}\
+\
+/* Chrome, Safari, Opera */\
+@-webkit-keyframes fadeOut\
+{\
+  0%   { opacity: 1; }\
+  100% { opacity: 0; visibility: hidden; }\
+}\
+\
+/* Standard syntax */\
+@keyframes fadeOut\
+{\
+  0%   { opacity: 1; }\
+  100% { opacity: 0; visibility: hidden; }\
+}\
+\
+/*---------------------------------------*/\
+\
+.move {\
+  /* Chrome, Safari, Opera */\
+  -webkit-animation-name: move;\
+  -webkit-animation-duration: 1s;\
+  -webkit-animation-timing-function: ease-in-out;\
+  -webkit-animation-delay: 3s;\
+  -webkit-animation-iteration-count: 1;\
+  -webkit-animation-direction: normal;\
+  -webkit-animation-fill-mode: forwards;\
+  -webkit-animation-play-state: running;\
+\
+  /* Standard syntax */\
+  animation-name: move;\
+  animation-duration: 1s;\
+  animation-timing-function: ease-in-out;\
+  animation-delay: 3s;\
+  animation-iteration-count:1;\
+  animation-direction: normal;\
+  animation-fill-mode: forwards;\
+  animation-play-state: running;\
+}\
+\
+/* Chrome, Safari, Opera */\
+@-webkit-keyframes move\
+{\
+  0%   { top: " + Math.round( 70 * scale_factor / 100 ) + "px; left: " + Math.round( 248 * scale_factor / 100 ) + "px; }\
+  100% { top: " + Math.round( 10 * scale_factor / 100 ) + "px; left: " + Math.round( 299 * scale_factor / 100 ) + "px; }\
+}\
+\
+/* Standard syntax */\
+@keyframes move\
+{\
+  0%   { top: " + Math.round( 70 * scale_factor / 100 ) + "px; left: " + Math.round( 248 * scale_factor / 100 ) + "px; }\
+  100% { top: " + Math.round( 10 * scale_factor / 100 ) + "px; left: " + Math.round( 299 * scale_factor / 100 ) + "px; }\
+}\
+\
+/*---------------------------------------*/\
+\
+.fadeIn {\
+  /* Chrome, Safari, Opera */\
+  -webkit-animation-name: fadeIn;\
+  -webkit-animation-duration: 3s;\
+  -webkit-animation-timing-function: ease-in-out;\
+  -webkit-animation-delay: 4s;\
+  -webkit-animation-iteration-count: 1;\
+  -webkit-animation-direction: normal;\
+  -webkit-animation-fill-mode: forwards;\
+  -webkit-animation-play-state: running;\
+\
+  /* Standard syntax */\
+  animation-name: fadeIn;\
+  animation-duration: 3s;\
+  animation-timing-function: ease-in-out;\
+  animation-delay: 4s;\
+  animation-iteration-count:1;\
+  animation-direction: normal;\
+  animation-fill-mode: forwards;\
+  animation-play-state: running;\
+}\
+\
+/* Chrome, Safari, Opera */\
+@-webkit-keyframes fadeIn\
+{\
+  0%   { opacity: 0; }\
+  100% { opacity: 1; }\
+}\
+\
+/* Standard syntax */\
+@keyframes fadeIn\
+{\
+  0%   { opacity: 0; }\
+  100% { opacity: 1; }\
+}\
+\
+/*---------------------------------------*/\
+\
+.transOut {\
+  /* Chrome, Safari, Opera */\
+  -webkit-animation-name: transOut;\
+  -webkit-animation-duration: .8s;\
+  -webkit-animation-timing-function: ease-out;\
+  -webkit-animation-iteration-count: 1;\
+  -webkit-animation-direction: normal;\
+  -webkit-animation-fill-mode: forwards;\
+  -webkit-animation-play-state: running;\
+\
+  /* Standard syntax */\
+  animation-name: transOut;\
+  animation-duration: .8s;\
+  animation-timing-function: ease-out;\
+  animation-iteration-count:1;\
+  animation-direction: normal;\
+  animation-fill-mode: forwards;\
+  animation-play-state: running;\
+}\
+\
+/* Chrome, Safari, Opera */\
+@-webkit-keyframes transOut\
+{\
+  0%   { opacity: 1; }\
+  100% { opacity: 0; }\
+}\
+\
+/* Standard syntax */\
+@keyframes transOut\
+{\
+  0%   { opacity: 1; }\
+  100% { opacity: 0; }\
+}\
+\
+/*---------------------------------------*/\
+\
+.transIn {\
+  /* Chrome, Safari, Opera */\
+  -webkit-animation-name: transIn;\
+  -webkit-animation-duration: .8s;\
+  -webkit-animation-timing-function: ease-in;\
+  -webkit-animation-iteration-count: 1;\
+  -webkit-animation-direction: normal;\
+  -webkit-animation-fill-mode: forwards;\
+  -webkit-animation-play-state: running;\
+\
+  /* Standard syntax */\
+  animation-name: transIn;\
+  animation-duration: .8s;\
+  animation-timing-function: ease-in;\
+  animation-iteration-count:1;\
+  animation-direction: normal;\
+  animation-fill-mode: forwards;\
+  animation-play-state: running;\
+}\
+\
+/* Chrome, Safari, Opera */\
+@-webkit-keyframes transIn\
+{\
+  0%   { opacity: 0; }\
+  100% { opacity: 1; }\
+}\
+\
+/* Standard syntax */\
+@keyframes transIn\
+{\
+  0%   { opacity: 0; }\
+  100% { opacity: 1; }\
+}\
+\
+/*---------------------------------------*/\
+\
+.flash {\
+  /* Chrome, Safari, Opera */\
+  -webkit-animation-name: flash;\
+  -webkit-animation-duration: .9s;\
+  -webkit-animation-timing-function: ease-out;\
+  -webkit-animation-iteration-count: 1;\
+  -webkit-animation-direction: normal;\
+  -webkit-animation-fill-mode: forwards;\
+  -webkit-animation-play-state: running;\
+\
+  /* Standard syntax */\
+  animation-name: flash;\
+  animation-duration: .9s;\
+  animation-timing-function: ease-out;\
+  animation-iteration-count:1;\
+  animation-direction: normal;\
+  animation-fill-mode: forwards;\
+  animation-play-state: running;\
+}\
+\
+/* Chrome, Safari, Opera */\
+@-webkit-keyframes flash\
+{\
+  0%   { opacity: .9; }\
+  100% { opacity: 0; }\
+}\
+\
+/* Standard syntax */\
+@keyframes flash\
+{\
+  0%   { opacity: .9; }\
+  100% { opacity: 0; }\
+}";
+
+document.getElementsByTagName('head')[0].appendChild(style);
+
+//========================
+//===  PRELOAD IMAGES  ===
+//========================
+
+window.imgArray = new Array();
+
+imgArray[0] = new Image(); imgArray[0].src  = 'image/pin1.png';
+imgArray[1] = new Image(); imgArray[1].src  = 'image/pin2.png';
+imgArray[2] = new Image(); imgArray[2].src  = 'image/pin3.png';
+imgArray[3] = new Image(); imgArray[3].src  = 'image/pin4.png';
+imgArray[4] = new Image(); imgArray[4].src  = 'image/pin5.png';
+
+imgArray[5] = new Image(); imgArray[5].src  = 'image/postit1.png';
+imgArray[6] = new Image(); imgArray[6].src  = 'image/postit2.png';
+imgArray[7] = new Image(); imgArray[7].src  = 'image/postit3.png';
+imgArray[8] = new Image(); imgArray[8].src  = 'image/postit4.png';
+imgArray[9] = new Image(); imgArray[9].src  = 'image/postit5.png';
+
+imgArray[10] = new Image(); imgArray[10].src  = 'image/wall.png';
+
+//________________________________________________________________________________________
+
+//=================================================
+//===  DOCUMENT DOMCONTENTLOADED EVENT HANDLER  ===
+//=================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  //=======================
+  //===  SETUP OBJECTS  ===
+  //=======================
+
+  setupPin();
+  setupViewer();
+  setupPostIt();
+}, true);
+
+//________________________________________________________________________________________
+
+//==================
+//===  PUSH PIN  ===
+//==================
+
+window.setupPin = function() {
+  window.pin = document.getElementById('pin');
+
+  pin.color = 0;
+  pin.state = 1;
+
+  pin.changeColor = function() {
+    while ( 1 == 1 ) {
+      var color = Math.floor((Math.random() * 5));
+      if ( pin.color != color ) { pin.color = color; break; }
+    }
+
+    pin.style.background = "url('" + imgArray[pin.color].src + "')";
+    pin.style.backgroundSize = Math.round( 35 * scale_factor / 100 ) + "px " + Math.round( 67 * scale_factor / 100 ) + "px";
+  }
+
+  pin.trigger = function(event) {
+    if ( event.which == 3 || event.ctrlKey ) { return true; }
+    else if ( pin.state == 1 ) {
+      pin.state = 0;
+      postit.changeColor();
+      postit.className = 'fadeOut';
+      pin.className = 'move';
+      slide.photo0.className = 'fadeIn';
+      slide.audio1.play();
+    }
+    else if ( pin.state == 2 ) {
+      pin.state = 0;
+      slide.wait = 7000;
+      slide.date = new Date();
+      slide.timer = window.setTimeout(slide.run, slide.wait);
+      slide.audio1.play();
+      slide.audio2.src = 'audio/track2.wav';
+      slide.photo1.addEventListener('mouseup', slide.toggle, true);
+      slide.photo1.style.cursor = 'pointer';
+      slide.sound.style.display = 'block';
+    }
+
+    pin.changeColor();
+  }
+
+  pin.addEventListener('mousedown', cancelEventPropagation, true);
+  pin.addEventListener('mouseup', pin.trigger, true);
+
+  pin.changeColor();
+}
+
+//________________________________________________________________________________________
+
+//==========================
+//===  SLIDESHOW VIEWER  ===
+//==========================
+
+window.setupViewer = function() {
+  window.slide = new Object();
+
+  slide.index = 0;
+  slide.state = 0;
+  slide.pause = 0;
+  slide.muted = 0;
+
+  slide.photo0 = document.getElementById('photo0');
+  slide.photo1 = document.getElementById('photo1');
+
+  slide.icon1  = document.getElementById('icon1' ); // Play
+  slide.icon2  = document.getElementById('icon2' ); // Pause
+
+  slide.sound  = document.getElementById('sound' );
+
+  window.polaroid = new Array();
+
+  polaroid[0]  = "url('slide/photo00.png')";
+  polaroid[1]  = "url('slide/photo01.png')";
+  polaroid[2]  = "url('slide/photo02.png')";
+  polaroid[3]  = "url('slide/photo03.png')";
+  polaroid[4]  = "url('slide/photo04.png')";
+  polaroid[5]  = "url('slide/photo05.png')";
+  polaroid[6]  = "url('slide/photo06.png')";
+  polaroid[7]  = "url('slide/photo07.png')";
+  polaroid[8]  = "url('slide/photo08.png')";
+  polaroid[9]  = "url('slide/photo09.png')";
+  polaroid[10] = "url('slide/photo10.png')";
+  polaroid[11] = "url('slide/photo11.png')";
+  polaroid[12] = "url('slide/photo12.png')";
+  polaroid[13] = "url('slide/photo13.png')";
+  polaroid[14] = "url('slide/photo14.png')";
+  polaroid[15] = "url('slide/photo15.png')";
+  polaroid[16] = "url('slide/photo16.png')";
+  polaroid[17] = "url('slide/photo17.png')";
+  polaroid[18] = "url('slide/photo18.png')";
+  polaroid[19] = "url('slide/photo19.png')";
+  polaroid[20] = "url('slide/photo20.png')";
+  polaroid[21] = "url('slide/photo21.png')";
+  polaroid[22] = "url('slide/photo22.png')";
+  polaroid[23] = "url('slide/photo23.png')";
+  polaroid[24] = "url('slide/photo24.png')";
+
+  slide.audio1 = new Audio();
+  slide.audio1.src = 'audio/track1.wav';
+  slide.audio1.type = "audio/wav";
+  slide.audio1.volume = .8;
+  slide.audio1.continue = 0;
+  slide.audio1.addEventListener('loadeddata', function() { if ( slide.muted ) { slide.audio1.muted = true; } }, false);
+
+  slide.audio2 = new Audio();
+  slide.audio2.src = 'audio/track2.wav';
+  slide.audio2.type = "audio/wav";
+  slide.audio2.volume = .8;
+  slide.audio2.continue = 0;
+  slide.audio2.addEventListener('loadeddata', function() { if ( slide.muted ) { slide.audio2.muted = true; } }, false);
+
+  slide.run = function() {
+    if ( slide.state == 0 ) {
+      slide.timer = null;
+
+      // Birdhouse Transition Effect
+      if ( slide.index == 13 ) {
+        slide.photo0.style.background = polaroid[14];
+        slide.photo0.style.backgroundSize = Math.round( 432 * scale_factor / 100 ) + "px " + Math.round( 470 * scale_factor / 100 ) + "px";
+      }
+      else if ( slide.index == 14 ) {
+        slide.photo0.style.background = polaroid[0];
+        slide.photo0.style.backgroundSize = Math.round( 432 * scale_factor / 100 ) + "px " + Math.round( 470 * scale_factor / 100 ) + "px";
+      }
+
+      slide.photo1.className = 'transOut';
+      slide.state = 1;
+    }
+    else if ( slide.state == 1 ) {
+      slide.index++;
+      slide.photo1.style.background = polaroid[slide.index];
+      slide.photo1.style.backgroundSize = Math.round( 432 * scale_factor / 100 ) + "px " + Math.round( 470 * scale_factor / 100 ) + "px";
+
+      // Music Timing
+      if      ( slide.index ==  8 ) { slide.audio2.play(); }
+      else if ( slide.index ==  9 ) { slide.audio1.src = 'audio/track3.wav'; }
+      else if ( slide.index == 12 ) { slide.audio1.play(); }
+      else if ( slide.index == 13 ) { slide.audio2.src = 'audio/track4.wav'; }
+      else if ( slide.index == 15 ) { slide.audio2.play(); }
+
+      slide.photo1.className = 'transIn';
+      slide.state = 2;
+    }
+    else {
+      if ( slide.index == 23 ) {
+        slide.audio1.src = 'audio/track1.wav';
+        slide.wait = 9000;
+        slide.date = new Date();
+        slide.timer = window.setTimeout(slide.run, slide.wait);
+      }
+      else if ( slide.index == 24 ) {
+        slide.index = 0;
+        pin.state = 2;
+        slide.photo1.removeEventListener('mouseup', slide.toggle, true);
+        slide.photo1.style.cursor = 'auto';
+        slide.sound.style.display = 'none';
+      }
+      else {
+        slide.wait = 5000;
+        slide.date = new Date();
+        slide.timer = window.setTimeout(slide.run, slide.wait);
+      }
+
+      slide.state = 0;
+    }
+  }
+
+  slide.toggle = function(event) {
+    if ( event.which == 3 || event.ctrlKey ) { return true; }
+    else if ( slide.pause ) {
+      // ===== Play ===== //
+
+      slide.pause = 0;
+
+      if ( slide.audio1.continue == 1 ) { slide.audio1.play(); slide.audio1.continue = 0; }
+      if ( slide.audio2.continue == 1 ) { slide.audio2.play(); slide.audio2.continue = 0; }
+
+      if ( slide.wait ) {
+        slide.date = new Date();
+        slide.timer = window.setTimeout(slide.run, slide.wait);
+      }
+      else {
+        slide.photo1.style.webkitAnimationPlayState = "running";
+        slide.photo1.style.animationPlayState = "running";
+      }
+
+      slide.icon1.className = 'flash';
+      window.setTimeout(function(){ slide.icon1.className = 'none'; }, 750);
+    }
+    else {
+      // ===== Pause ===== //
+
+      slide.pause = 1;
+
+      if ( slide.timer ) {
+        slide.wait -= new Date() - slide.date;
+        window.clearTimeout(slide.timer);
+        slide.timer = null;
+      }
+      else {
+        slide.photo1.style.webkitAnimationPlayState = "paused";
+        slide.photo1.style.animationPlayState = "paused";
+        slide.wait = 0;
+      }
+
+      if ( ! slide.audio1.paused ) { slide.audio1.pause(); slide.audio1.continue = 1; }
+      if ( ! slide.audio2.paused ) { slide.audio2.pause(); slide.audio2.continue = 1; }
+
+      slide.icon2.className = 'flash';
+      window.setTimeout(function(){ slide.icon2.className = 'none'; }, 750);
+    }
+  }
+
+  slide.mute = function(event) {
+    if ( event.which == 3 || event.ctrlKey ) { return true; }
+    else if ( slide.muted ) {
+      // ===== Un-Mute ===== //
+
+      slide.muted = 0;
+      slide.audio1.muted = false;
+      slide.audio2.muted = false;
+      slide.sound.style.background = "url('image/sound1.png')";
+      slide.sound.style.backgroundSize = Math.round( 35 * scale_factor / 100 ) + "px " + Math.round( 35 * scale_factor / 100 ) + "px";
+    }
+    else {
+      // ===== Mute ===== //
+
+      slide.muted = 1;
+      slide.audio1.muted = true;
+      slide.audio2.muted = true;
+      slide.sound.style.background = "url('image/sound0.png')";
+      slide.sound.style.backgroundSize = Math.round( 35 * scale_factor / 100 ) + "px " + Math.round( 35 * scale_factor / 100 ) + "px";
+    }
+  }
+
+  slide.start = function() {
+    slide.photo1.style.visibility = 'visible';
+    slide.run();
+    slide.photo1.addEventListener('mouseup', slide.toggle, true);
+    slide.photo1.style.cursor = 'pointer';
+    slide.sound.style.display = 'block';
+  }
+
+  slide.photo1.addEventListener('mousedown', cancelEventPropagation, true);
+
+  slide.sound.addEventListener('mousedown', cancelEventPropagation, true);
+  slide.sound.addEventListener('mouseup', slide.mute, true);
+
+  slide.photo1.addEventListener('webkitAnimationEnd', slide.run, false);
+  slide.photo1.addEventListener('MSAnimationEnd'    , slide.run, false);
+  slide.photo1.addEventListener('oanimationend'     , slide.run, false);
+  slide.photo1.addEventListener('animationend'      , slide.run, false);
+
+  slide.photo0.addEventListener('webkitAnimationEnd', slide.start, false);
+  slide.photo0.addEventListener('MSAnimationEnd'    , slide.start, false);
+  slide.photo0.addEventListener('oanimationend'     , slide.start, false);
+  slide.photo0.addEventListener('animationend'      , slide.start, false);
+}
+
+//________________________________________________________________________________________
+
+//======================
+//===  POST-IT NOTE  ===
+//======================
+
+window.setupPostIt = function() {
+  window.postit = document.getElementById('postit');
+
+  postit.color = 5;
+
+  postit.changeColor = function() {
+    while ( 1 == 1 ) {
+      var number = Math.floor((Math.random() * 5)) + 5;
+      if ( postit.color != number ) { postit.color = number; break; }
+    }
+
+    postit.style.background = "url('" + imgArray[postit.color].src + "')";
+    postit.style.backgroundSize = Math.round( 321 * scale_factor / 100 ) + "px " + Math.round( 345 * scale_factor / 100 ) + "px";
+  }
+
+  //=======================
+  //===  SPARROW CHIRP  ===
+  //=======================
+
+  postit.chirp = new Audio();
+  postit.chirp.src    = 'audio/sparrow.wav';
+  postit.chirp.type   = "audio/wav";
+  postit.chirp.volume = .2;
+
+  //========================
+  //===  TOGGLE POST-IT  ===
+  //========================
+
+  postit.addEventListener('mousedown', function(event) {
+    postit.changeColor();
+    postit.chirp.play();
+    return cancelEventPropagation(event);
+  }, true);
+
+  postit.changeColor();
+}
+
+//________________________________________________________________________________________
+
+//======================
+//===  CANCEL EVENT  ===
+//======================
+
+window.cancelEventPropagation = function(event) {
+  event = event ? event : window.event;
+  if(event.stopPropagation) { event.stopPropagation(); }
+  if(event.preventDefault) { event.preventDefault(); }
+  event.cancelBubble = true;
+  event.cancel = true;
+  event.returnValue = false;
+  return false;
+}
+
+//________________________________________________________________________________________
+
+</script>
+</head>
+<body>
+<div id="container">
+  <div id="photo0"></div>
+  <div id="photo1"></div>
+  <div id="sound"></div>
+  <div id="icon1" class="none"></div>
+  <div id="icon2" class="none"></div>
+  <div id="postit">
+    <div id="note"></div>
+  </div>
+  <div id="pin"></div>
+</div>
+</body>
+</html>
